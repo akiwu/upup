@@ -5,14 +5,13 @@ import db                   from './db';
 import './App.css';
 
 const stores = [
-  {name:'todos', option: { autoIncrement: true }}
+  {name:'todos', option: {keyPath: 'title'}}
 ];
 
 const MyDB = new db('upup', 1, stores);
 
 MyDB.open((e) => {
   window.console.log(e);
-  console.log(e);
   });
 
 
@@ -32,18 +31,20 @@ class App extends Component {
 
   componentDidMount() {
     window.setTimeout(
-      () => {
-        MyDB.getAll('todos', (results) => {
-          if(Array.isArray(results)) {
-            const list = [];
-            results.map((o, i) => {
-              o[i+1] && (o[i+1].value !== undefined) && list.push(o[i+1].value);
-            });
-            this.setState({list});
-          }
-        });
-      }, 100
+      this.fetchTodos.bind(this), 100
     );
+  }
+
+  fetchTodos() {
+    MyDB.getAll('todos', (results) => {
+      const list = [];
+      if(Array.isArray(results)) {
+        results.map(o => {
+          list.push(Object.keys(o)[0]);
+        });
+        this.setState({list});
+      }
+    });
   }
 
   render() {
@@ -55,26 +56,34 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <h1>今天</h1>
-        <h2>最重要的三件事</h2>
-        <h2>其他</h2>
-        <form onSubmit={this.submit.bind(this)}>
-          <input type="text" value={this.state.content} onChange={this.inputChange.bind(this)}/>
-        </form>
-        {
-        list.map((o, i) => (
-              <li key={i}>{o}</li>
-                ))
-        }
-        1、press enter add new todo item
-        2、click midify
-        3、Three things before on important inside
-      </div>
+        <section className="main-page">
+          <h1>今天</h1>
+          <h2>最重要的三件事</h2>
+          <h2>其他</h2>
+          <form onSubmit={this.submit.bind(this)}>
+            <input type="text" value={this.state.content} onChange={this.inputChange.bind(this)}/>
+          </form>
+          {
+          list.map((o, i) => (
+                <li key={i}>
+                  {o}<span onClick={() => {this.delete(o)}}>❎</span>
+                </li>
+                  ))
+          }
+
+          </section>
+        </div>
     );
   }
 
   inputChange(e) {
     this.setState({content: e.target.value});
+  }
+
+  delete(title) {
+    MyDB.remove('todos', title, () => {
+      this.fetchTodos();
+    });
   }
 
   submit(e) {
@@ -85,7 +94,7 @@ class App extends Component {
 
     this.setState({content: '', list});
 
-    MyDB.add('todos', {value: inputValue}, (e) => {
+    MyDB.add('todos', {title: inputValue}, (e) => {
       window.console.log(e);
     });
   }
