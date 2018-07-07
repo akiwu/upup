@@ -7,7 +7,7 @@
 
 class db {
   constructor(dbName, dbVersion, stores) {
-    this.db;
+    this.db = {};
     this.dbName = dbName;
     this.dbVersion = dbVersion;
     this.stores = stores;
