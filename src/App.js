@@ -12,7 +12,7 @@ const MyDB = new db('upup', 1, stores);
 
 MyDB.open((e) => {
   window.console.log(e);
-  });
+});
 
 
 class App extends Component {
@@ -31,7 +31,7 @@ class App extends Component {
 
   componentDidMount() {
     window.setTimeout(
-      this.fetchTodos.bind(this), 100
+      this.fetchTodos.bind(this), 500
     );
   }
 
@@ -56,21 +56,35 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <section className="main-page">
+        <section className="main-page ui form">
           <h1>今天</h1>
           <h2>最重要的三件事</h2>
           <h2>其他</h2>
           <form onSubmit={this.submit.bind(this)}>
-            <input type="text" value={this.state.content} onChange={this.inputChange.bind(this)}/>
+            <div className="ui left icon input">
+              <input type="text"
+                value={this.state.content}
+                onChange={this.inputChange.bind(this)}
+                placeholder="回车 添加新 Todo"
+              />
+              <i className="plus icon"></i>
+            </div>
           </form>
+          <div className="grouped fields">
           {
           list.map((o, i) => (
-                <li key={i}>
-                  {o}<span onClick={() => {this.delete(o)}}>❎</span>
-                </li>
-                  ))
+            <li key={i} className="field hover-show">
+              <span className="ui checked checkbox">
+                <input type="checkbox" checked onChange={this.checkboxChange} />
+                <label>{o}</label>
+              </span>
+              <span className="delete-btn" onClick={() => {this.delete(o)}}>
+                <i className="times icon"></i>
+              </span>
+            </li>
+          ))
           }
-
+        </div>
           </section>
         </div>
     );
@@ -78,6 +92,10 @@ class App extends Component {
 
   inputChange(e) {
     this.setState({content: e.target.value});
+  }
+
+  checkboxChange = () => {
+    console.log('wwww');
   }
 
   delete(title) {
