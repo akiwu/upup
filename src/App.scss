@@ -1,6 +1,6 @@
 @import '../node_modules/semantic-ui-css/semantic.min.css';
-.App {
-}
+
+$olive: #32CD32;
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
@@ -34,6 +34,12 @@ li{
   &:hover {
     .delete-btn {
       display: inline-block!important;
+    }
+  }
+  label {
+    &.first-three {
+      color: $olive!important;
+      font-weight: bold;
     }
   }
 }

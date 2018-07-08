@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes            from 'prop-types';
 import logo                 from './logo.svg';
 import db                   from './db';
+import cn                   from 'classnames';
 import './App.css';
 
 const stores = [
@@ -57,9 +58,7 @@ class App extends Component {
           <h1 className="App-title">Welcome to React</h1>
         </header>
         <section className="main-page ui form">
-          <h1>今天</h1>
-          <h2>最重要的三件事</h2>
-          <h2>其他</h2>
+          <h1 className="header">今天</h1>
           <form onSubmit={this.submit.bind(this)}>
             <div className="ui left icon input">
               <input type="text"
@@ -76,7 +75,7 @@ class App extends Component {
             <li key={i} className="field hover-show">
               <span className="ui checked checkbox">
                 <input type="checkbox" checked onChange={this.checkboxChange} />
-                <label>{o}</label>
+                <label className={cn({'first-three': i < 3})}>{o}</label>
               </span>
               <span className="delete-btn" onClick={() => {this.delete(o)}}>
                 <i className="times icon"></i>

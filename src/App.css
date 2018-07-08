@@ -26,6 +26,10 @@ li .delete-btn {
 li:hover .delete-btn {
   display: inline-block !important; }
 
+li label.first-three {
+  color: #32CD32 !important;
+  font-weight: bold; }
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg); }
