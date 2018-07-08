@@ -3,6 +3,7 @@ import PropTypes            from 'prop-types';
 import logo                 from './logo.svg';
 import db                   from './db';
 import cn                   from 'classnames';
+import moment               from 'moment';
 import './App.css';
 
 const stores = [
@@ -38,13 +39,7 @@ class App extends Component {
 
   fetchTodos() {
     MyDB.getAll('todos', (results) => {
-      const list = [];
-      if(Array.isArray(results)) {
-        results.map(o => {
-          list.push(Object.keys(o)[0]);
-        });
-        this.setState({list});
-      }
+      this.setState({list: results});
     });
   }
 
@@ -55,10 +50,9 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
         </header>
-        <section className="main-page ui form">
-          <h1 className="header">今天</h1>
+        <section className="main-page ui form container">
+          <h1 className="ui header">今天</h1>
           <form onSubmit={this.submit.bind(this)}>
             <div className="ui left icon input">
               <input type="text"
@@ -74,8 +68,10 @@ class App extends Component {
           list.map((o, i) => (
             <li key={i} className="field hover-show">
               <span className="ui checked checkbox">
-                <input type="checkbox" checked onChange={this.checkboxChange} />
-                <label className={cn({'first-three': i < 3})}>{o}</label>
+                <input type="checkbox" checked={o.status === 'COMPLATE'} onChange={() =>this.checkboxChange(o)} />
+                <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
+                  {o.title}
+                </label>
               </span>
               <span className="delete-btn" onClick={() => {this.delete(o)}}>
                 <i className="times icon"></i>
@@ -93,12 +89,19 @@ class App extends Component {
     this.setState({content: e.target.value});
   }
 
-  checkboxChange = () => {
-    console.log('wwww');
+  checkboxChange = (o) => {
+    const todo = o;
+    todo.status = 'COMPLATE';
+    todo.complateDateTime = Date.parse(new Date());
+
+    MyDB.add('todos', todo, (e) => {
+      window.console.log(e);
+      this.fetchTodos();
+    });
   }
 
-  delete(title) {
-    MyDB.remove('todos', title, () => {
+  delete(o) {
+    MyDB.remove('todos', o.title, () => {
       this.fetchTodos();
     });
   }
@@ -106,13 +109,18 @@ class App extends Component {
   submit(e) {
     e.preventDefault();
     const inputValue = this.state.content;
-    let {list} = this.state;
-    list.push(inputValue);
+    this.setState({content: ''});
 
-    this.setState({content: '', list});
+    const todo = {
+      title: inputValue,
+      joinDateTime: Date.parse(new Date()),
+      complateDateTime: Date.parse(new Date()),
+      status: 'INIT'
+    };
 
-    MyDB.add('todos', {title: inputValue}, (e) => {
+    MyDB.add('todos', todo, (e) => {
       window.console.log(e);
+      this.fetchTodos();
     });
   }
 

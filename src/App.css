@@ -11,8 +11,8 @@
   color: white; }
 
 .main-page {
-  margin: 0 auto;
-  width: 800px; }
+  margin: 20px auto;
+  width: 700px; }
 
 .App-title {
   font-size: 1.5em; }
@@ -29,6 +29,12 @@ li:hover .delete-btn {
 li label.first-three {
   color: #32CD32 !important;
   font-weight: bold; }
+
+li label.complate-status {
+  text-decoration: line-through;
+  font-style: italic;
+  font-weight: 400;
+  color: #666666 !important; }
 
 @keyframes App-logo-spin {
   from {

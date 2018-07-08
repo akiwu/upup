@@ -61,7 +61,7 @@ class db {
       request.onsuccess = e => {
         let cursor = e.target.result;
         if (cursor) {
-          results.push({ [cursor.key]: cursor.value });
+          results.push(cursor.value);
           cursor.continue();
         } else {
           callback(results);
