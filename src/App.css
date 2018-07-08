@@ -1,24 +1,8 @@
 @import url(../node_modules/semantic-ui-css/semantic.min.css);
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px; }
-
-.App-header {
-  text-align: center;
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white; }
-
 .main-page {
-  margin: 20px auto;
+  margin-top: 20px;
+  margin-left: 250px;
   width: 700px; }
-
-.App-title {
-  font-size: 1.5em; }
-
-.App-intro {
-  font-size: large; }
 
 li .delete-btn {
   display: none !important; }
@@ -35,6 +19,9 @@ li label.complate-status {
   font-style: italic;
   font-weight: 400;
   color: #666666 !important; }
+
+.ui.inverted.menu {
+  background: cornflowerblue; }
 
 @keyframes App-logo-spin {
   from {
