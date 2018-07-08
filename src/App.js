@@ -91,8 +91,13 @@ class App extends Component {
 
   checkboxChange = (o) => {
     const todo = o;
-    todo.status = 'COMPLATE';
-    todo.complateDateTime = Date.parse(new Date());
+    if(todo.status !== 'COMPLATE') {
+      todo.status = 'COMPLATE';
+      todo.complateDateTime = Date.parse(new Date());
+    } else {
+      todo.status = 'INIT';
+      todo.complateDateTime = undefined;
+    }
 
     MyDB.add('todos', todo, (e) => {
       window.console.log(e);
