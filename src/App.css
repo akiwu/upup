@@ -20,6 +20,9 @@ li label.complate-status {
   font-weight: 400;
   color: #666666 !important; }
 
+li label .highlight-tag {
+  color: cornflowerblue; }
+
 .ui.inverted.menu {
   background: cornflowerblue; }
 

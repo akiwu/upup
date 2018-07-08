@@ -102,7 +102,7 @@ class App extends Component {
                           onChange={() =>this.checkboxChange(o)}
                         />
                         <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
-                          {o.title}
+                          <span className="highlight-tag">{'#' + o.tag + ' '}</span>{o.title}
                         </label>
                       </span>
                       <span className="delete-btn" onClick={() => {this.delete(o)}}>
@@ -118,6 +118,7 @@ class App extends Component {
               <span className="ui checked checkbox">
                 <input type="checkbox" checked={o.status === 'COMPLATE'} onChange={() =>this.checkboxChange(o)} />
                 <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
+                  {o.tag ? <span className="highlight-tag">{'#' + o.tag + ' '}</span> : null}
                   {o.title}
                 </label>
               </span>
@@ -169,12 +170,13 @@ class App extends Component {
 
   submit(e) {
     e.preventDefault();
-    const inputValue = this.state.content;
+    let inputValue = this.state.content;
     const { currentTag } = this.state;
     const matchArr = inputValue.match(/#(.*)\s/);
     let tag;
     if(matchArr) {
       const match = matchArr[0];
+      inputValue = inputValue.slice(match.length);
       const item = match.slice(1, match.length-1).trim();
       tag = {title: item};
       MyDB.add('tags', tag, (e) => {
@@ -184,7 +186,7 @@ class App extends Component {
     this.setState({content: ''});
 
     const todo = {
-      title: currentTag ? ('#' + currentTag + ' ' + inputValue) : inputValue,
+      title: inputValue,
       joinDateTime: Date.parse(new Date()),
       complateDateTime: Date.parse(new Date()),
       status: 'INIT',
