@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import PropTypes            from 'prop-types';
 import logo                 from './logo.svg';
 import db                   from './db';
 import cn                   from 'classnames';
-import moment               from 'moment';
 import './App.css';
 
 const stores = [
-  {name:'todos', option: {keyPath: 'title'}}
+  {name:'todos', option: {keyPath: 'title'}},
+  {name:'tags', option: {keyPath: 'title'}}
 ];
 
-const MyDB = new db('upup', 1, stores);
+const MyDB = new db('upup', 2, stores);
 
 MyDB.open((e) => {
   window.console.log(e);
@@ -27,7 +26,8 @@ class App extends Component {
 
     this.state = {
       content: '',
-      list: []
+      list: [],
+      tags: []
     }
   }
 
@@ -43,8 +43,14 @@ class App extends Component {
     });
   }
 
+  fetchTags() {
+    MyDB.getAll('tags', (results) => {
+      this.setState({tags: results});
+    });
+  }
+
   render() {
-    const {list} = this.state;
+    const {list, tags} = this.state;
     if(!list) return null;
     return (
       <div className="App">
@@ -80,6 +86,10 @@ class App extends Component {
           ))
           }
         </div>
+        {tags.map(o => (
+            <li>{o.title}</li>
+          ))
+        }
           </section>
         </div>
     );
@@ -114,6 +124,15 @@ class App extends Component {
   submit(e) {
     e.preventDefault();
     const inputValue = this.state.content;
+    const matchArr = inputValue.match(/#(.*)\s/);
+    if(matchArr) {
+      const match = matchArr[0];
+      const item = match.slice(1, match.length-1);
+      const tag = {title: item};
+      MyDB.add('tags', tag, (e) => {
+        this.fetchTags();
+      });
+    };
     this.setState({content: ''});
 
     const todo = {
