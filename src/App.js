@@ -59,9 +59,6 @@ class App extends Component {
       <div className="App">
         <div className="ui visible vertical inverted menu sidebar">
           <div className="item">
-            <div className="header">今天</div>
-          </div>
-          <div className="item">
             <div className="header" onClick={() => this.changeTag()}>所有</div>
           </div>
           <div className="item">
