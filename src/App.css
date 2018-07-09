@@ -52,6 +52,8 @@ li {
 
 .ui.inverted.menu {
   background: cornflowerblue; }
+  .ui.inverted.menu.item {
+    cursor: pointer; }
 
 /****** 重置 rc-calendar 组件样式 *****/
 .rc-calendar {

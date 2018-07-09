@@ -33,6 +33,7 @@ class App extends Component {
     this.state = {
       content: '',
       currentTag: null,
+      currentSelectDate: null,
       list: [],
       tags: []
     }
@@ -60,7 +61,7 @@ class App extends Component {
   }
 
   render() {
-    const { list, tags, currentTag } = this.state;
+    const { list, tags, currentTag, currentSelectDate } = this.state;
     if(!list) return null;
     return (
       <div className="App">
@@ -89,12 +90,15 @@ class App extends Component {
               formatter='YYYY-MM-DD'
               defaultValue={now}
               showDateInput={false}
+              onSelect={this.calendarSelect}
             />
           </div>
         </div>
         <section className="main-page ui form">
           <header>
-            <h1 className="ui header">{currentTag ? currentTag : '所有'}</h1>
+            <h1 className="ui header">
+              {currentTag ? currentTag : (currentSelectDate ? moment(currentSelectDate).format('YYYY年M月D日') : '所有')}
+            </h1>
             <form onSubmit={this.submit.bind(this)}>
               <div className="ui left icon input">
                 <input type="text"
@@ -133,7 +137,31 @@ class App extends Component {
                   )
                 }
               })
-            :
+              : (currentSelectDate ?
+                list.map((o, i) => {
+                  if (moment.unix(o.joinDateTime/1000).format('YYYYMD') === moment(currentSelectDate).format('YYYYMD')) {
+                  return (
+            <li key={i} className="field hover-show">
+              <span className="ui checked checkbox">
+                <input type="checkbox" checked={o.status === 'COMPLATE'} onChange={() =>this.checkboxChange(o)} />
+                <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
+                  {o.tag ? <span className="highlight-tag">{'#' + o.tag + ' '}</span> : null}
+                  {o.title}
+                </label>
+              </span>
+              {
+                new Date(o.joinDateTime).getFullYear() === moment().year() ?
+                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("M月D日")}</span>
+                :
+                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("YYYY年M月D日")}</span>
+              }
+              <span className="delete-btn" onClick={() => {this.delete(o)}}>
+                <i className="times icon"></i>
+              </span>
+            </li>
+            )}
+            })
+              :
             list.map((o, i) => (
             <li key={i} className="field hover-show">
               <span className="ui checked checkbox">
@@ -153,7 +181,7 @@ class App extends Component {
                 <i className="times icon"></i>
               </span>
             </li>
-            ))
+            )))
             }
           </div>
         </section>
@@ -167,12 +195,22 @@ class App extends Component {
     this.setState({content: e.target.value});
   }
 
+  calendarSelect = (dateTime) => {
+    this.setState({
+      currentSelectDate: dateTime,
+      currentTag: null
+});
+  }
+
   changeTag(o) {
     let tag = null;
     if(o) {
       tag = o.title;
     }
-    this.setState({currentTag: tag});
+    this.setState({
+      currentTag: tag,
+      currentSelectDate: null
+    });
   }
 
   checkboxChange = (o) => {
@@ -214,9 +252,16 @@ class App extends Component {
     };
     this.setState({content: ''});
 
+    const joinDateTime = () => {
+      if(this.state.currentSelectDate) {
+        return moment(this.state.currentSelectDate).valueOf();
+      }
+      return Date.parse(new Date());
+    }
+
     const todo = {
       title: inputValue,
-      joinDateTime: Date.parse(new Date()),
+      joinDateTime: joinDateTime(),
       complateDateTime: Date.parse(new Date()),
       status: 'INIT',
       tag: (tag && tag.title) || currentTag || ''

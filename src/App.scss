@@ -71,6 +71,9 @@ li{
 
 .ui.inverted.menu {
   background: cornflowerblue;
+  &.item {
+    cursor: pointer;
+  }
 }
 
 
