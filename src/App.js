@@ -93,17 +93,19 @@ class App extends Component {
           </div>
         </div>
         <section className="main-page ui form">
-          <h1 className="ui header">{currentTag ? currentTag : '所有'}</h1>
-          <form onSubmit={this.submit.bind(this)}>
-            <div className="ui left icon input">
-              <input type="text"
-                value={this.state.content}
-                onChange={this.inputChange.bind(this)}
-                placeholder="回车 添加新 Todo"
-              />
-              <i className="plus icon"></i>
-            </div>
-          </form>
+          <header>
+            <h1 className="ui header">{currentTag ? currentTag : '所有'}</h1>
+            <form onSubmit={this.submit.bind(this)}>
+              <div className="ui left icon input">
+                <input type="text"
+                  value={this.state.content}
+                  onChange={this.inputChange.bind(this)}
+                  placeholder="回车 添加新 Todo"
+                />
+                <i className="plus icon"></i>
+              </div>
+            </form>
+          </header>
           <div className="grouped fields">
             { currentTag ?
               list.map((o, i) => {
@@ -118,6 +120,12 @@ class App extends Component {
                           <span className="highlight-tag">{'#' + o.tag + ' '}</span>{o.title}
                         </label>
                       </span>
+                      {
+                        new Date(o.joinDateTime).getFullYear() === moment().year() ?
+                        <span className="datetime">{moment.unix(o.joinDateTime/1000).format("M月D日")}</span>
+                        :
+                        <span className="datetime">{moment.unix(o.joinDateTime/1000).format("YYYY年M月D日")}</span>
+                      }
                       <span className="delete-btn" onClick={() => {this.delete(o)}}>
                         <i className="times icon"></i>
                       </span>
@@ -135,15 +143,23 @@ class App extends Component {
                   {o.title}
                 </label>
               </span>
+              {
+                new Date(o.joinDateTime).getFullYear() === moment().year() ?
+                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("M月D日")}</span>
+                :
+                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("YYYY年M月D日")}</span>
+              }
               <span className="delete-btn" onClick={() => {this.delete(o)}}>
                 <i className="times icon"></i>
               </span>
             </li>
-          ))
-          }
-        </div>
-      </section>
-        </div>
+            ))
+            }
+          </div>
+        </section>
+        <section className="right-part">
+        </section>
+      </div>
     );
   }
 

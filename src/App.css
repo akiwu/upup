@@ -1,28 +1,54 @@
 @charset "UTF-8";
 @import url(../node_modules/semantic-ui-css/semantic.min.css);
+.App {
+  height: 100%;
+  position: relative; }
+
+#root {
+  height: 100%; }
+
 .main-page {
-  margin-top: 20px;
-  margin-left: 250px;
-  width: 700px; }
+  padding-top: 20px;
+  position: absolute !important;
+  right: 43%;
+  left: 250px; }
+  .main-page .scroll-list {
+    height: 100%; }
 
-li .delete-btn {
-  display: none !important; }
+li {
+  position: relative; }
+  li .delete-btn {
+    display: none !important; }
+  li:hover .delete-btn {
+    display: inline-block !important; }
+  li label.first-three {
+    color: #32CD32 !important;
+    font-weight: bold; }
+  li label.complate-status {
+    text-decoration: line-through;
+    font-style: italic;
+    font-weight: 400;
+    color: #666666 !important; }
+  li label .highlight-tag {
+    color: cornflowerblue; }
+  li .datetime {
+    color: #fd5d5f;
+    font-size: 12px;
+    margin-left: 10px;
+    position: absolute;
+    right: 20px;
+    bottom: 0;
+    top: 0; }
 
-li:hover .delete-btn {
-  display: inline-block !important; }
-
-li label.first-three {
-  color: #32CD32 !important;
-  font-weight: bold; }
-
-li label.complate-status {
-  text-decoration: line-through;
-  font-style: italic;
-  font-weight: 400;
-  color: #666666 !important; }
-
-li label .highlight-tag {
-  color: cornflowerblue; }
+.right-part {
+  width: 43%;
+  background: #fafafa;
+  border-left: 1px solid #ededed;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%; }
 
 .ui.inverted.menu {
   background: cornflowerblue; }
