@@ -86,15 +86,9 @@ class App extends Component {
             <div className="header">日历</div>
             <Calendar
               locale={zhCN}
-              style={{ zIndex: 1000 }}
-              dateInputPlaceholder="请输入日期~"
               formatter='YYYY-MM-DD'
-              disabledTime={null}
-              timePicker={null}
               defaultValue={now}
               showDateInput={false}
-              showToday={true}
-              disabledDate={null}
             />
           </div>
         </div>
