@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import db                   from './db';
 import cn                   from 'classnames';
+import Calendar             from 'rc-calendar';
+import zhCN                 from 'rc-calendar/lib/locale/zh_CN';
+import moment               from 'moment';
+import 'moment/locale/zh-cn';
+import 'rc-calendar/assets/index.css';
 import './App.css';
+
+const now = moment().locale('zh-cn').utcOffset(8);
 
 const stores = [
   {name:'todos', option: {keyPath: 'title'}},
@@ -74,6 +81,21 @@ class App extends Component {
                 ))
               }
             </div>
+          </div>
+          <div className="item calendar">
+            <div className="header">日历</div>
+            <Calendar
+              locale={zhCN}
+              style={{ zIndex: 1000 }}
+              dateInputPlaceholder="请输入日期~"
+              formatter='YYYY-MM-DD'
+              disabledTime={null}
+              timePicker={null}
+              defaultValue={now}
+              showDateInput={false}
+              showToday={true}
+              disabledDate={null}
+            />
           </div>
         </div>
         <section className="main-page ui form">
