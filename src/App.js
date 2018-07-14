@@ -6,7 +6,7 @@ import zhCN                 from 'rc-calendar/lib/locale/zh_CN';
 import moment               from 'moment';
 import 'moment/locale/zh-cn';
 import 'rc-calendar/assets/index.css';
-import './App.css';
+import './styles/App.css';
 
 const now = moment().locale('zh-cn').utcOffset(8);
 
