@@ -206,6 +206,17 @@ li{
   color: rgb(226,183,59);
 }
 
+input.ui.small.edit-todo-input {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  display: inline-block;
+  padding: 2px 2px;
+  width: auto;
+  vertical-align: baseline;
+}
+
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }

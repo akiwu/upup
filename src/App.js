@@ -11,8 +11,8 @@ import './styles/App.css';
 const now = moment().locale('zh-cn').utcOffset(8);
 
 const stores = [
-  {name:'todos', option: {keyPath: 'title'}},
-  {name:'tags', option: {keyPath: 'title'}}
+  {name:'todos', option: {autoIncrement: true, keyPath: 'id'}},
+  {name:'tags', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'title', item: 'unique', value: true}]}
 ];
 
 const MyDB = new db('upup', 2, stores);
@@ -34,6 +34,7 @@ class App extends Component {
       content: '',
       currentTag: null,
       currentSelectDate: null,
+      needEditItem: null,
       list: [],
       tags: []
     }
@@ -44,7 +45,7 @@ class App extends Component {
       () => {
         this.fetchTodos()
         this.fetchTags()
-      }, 500
+      }, 800
     );
   }
 
@@ -148,6 +149,7 @@ class App extends Component {
   }
 
   renderTODOItem(o, i) {
+    const { needEditItem, editingTODO } = this.state;
     const dateFormat = new Date(o.joinDateTime).getFullYear() === moment().year() ?
       'M月D日' : 'YYYY年M月D日';
     const date = this.unixToDate(o.joinDateTime, dateFormat);
@@ -159,7 +161,16 @@ class App extends Component {
           />
           <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
             <span className="highlight-tag">{'#' + o.tag + ' '}</span>
-            {o.title}
+            { needEditItem && needEditItem.title === o.title ?
+            <input
+              className="ui small edit-todo-input"
+              value={editingTODO}
+              onChange={(e) => {this.setState({editingTODO: e.target.value})}}
+              onBlur={this.saveEdit.bind(this)}
+            />
+            :
+            <span onClick={() => {this.editable(o)}}>{o.title}</span>
+            }
           </label>
         </span>
         <span className="datetime">{date}</span>
@@ -176,6 +187,24 @@ class App extends Component {
 
   inputChange(e) {
     this.setState({content: e.target.value});
+  }
+
+  saveEdit(e) {
+    const { needEditItem } = this.state;
+    const title = e.target.value;
+    const todo = needEditItem;
+    todo.title = title;
+    MyDB.add('todos', todo, (e) => {
+      window.console.log(e);
+    });
+    this.setState({needEditItem: null});
+  }
+
+  editable(o) {
+    this.setState({
+      needEditItem: o,
+      editingTODO: o.title
+    });
   }
 
   calendarSelect = (dateTime) => {
@@ -213,7 +242,7 @@ class App extends Component {
   }
 
   delete(o) {
-    MyDB.remove('todos', o.title, () => {
+    MyDB.remove('todos', o.id, () => {
       this.fetchTodos();
     });
   }
