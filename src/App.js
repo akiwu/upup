@@ -97,7 +97,7 @@ class App extends Component {
         <section className="main-page ui form">
           <header>
             <h1 className="ui header">
-              {currentTag ? currentTag : (currentSelectDate ? moment(currentSelectDate).format('YYYY年M月D日') : '所有')}
+              {currentTag ? currentTag : (currentSelectDate ? this.unixToDate(currentSelectDate, 'YYYY年M月D日') : '所有')}
             </h1>
             <form onSubmit={this.submit.bind(this)}>
               <div className="ui left icon input">
@@ -111,84 +111,67 @@ class App extends Component {
             </form>
           </header>
           <div className="grouped fields">
-            { currentTag ?
-              list.map((o, i) => {
-                if(o.tag === currentTag) {
-                  return(
-                    <li key={i} className="field hover-show">
-                      <span className="ui checked checkbox">
-                        <input type="checkbox" checked={o.status === 'COMPLATE'}
-                          onChange={() =>this.checkboxChange(o)}
-                        />
-                        <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
-                          <span className="highlight-tag">{'#' + o.tag + ' '}</span>{o.title}
-                        </label>
-                      </span>
-                      {
-                        new Date(o.joinDateTime).getFullYear() === moment().year() ?
-                        <span className="datetime">{moment.unix(o.joinDateTime/1000).format("M月D日")}</span>
-                        :
-                        <span className="datetime">{moment.unix(o.joinDateTime/1000).format("YYYY年M月D日")}</span>
-                      }
-                      <span className="delete-btn" onClick={() => {this.delete(o)}}>
-                        <i className="times icon"></i>
-                      </span>
-                    </li>
-                  )
-                }
-              })
-              : (currentSelectDate ?
-                list.map((o, i) => {
-                  if (moment.unix(o.joinDateTime/1000).format('YYYYMD') === moment(currentSelectDate).format('YYYYMD')) {
-                  return (
-            <li key={i} className="field hover-show">
-              <span className="ui checked checkbox">
-                <input type="checkbox" checked={o.status === 'COMPLATE'} onChange={() =>this.checkboxChange(o)} />
-                <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
-                  {o.tag ? <span className="highlight-tag">{'#' + o.tag + ' '}</span> : null}
-                  {o.title}
-                </label>
-              </span>
-              {
-                new Date(o.joinDateTime).getFullYear() === moment().year() ?
-                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("M月D日")}</span>
-                :
-                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("YYYY年M月D日")}</span>
-              }
-              <span className="delete-btn" onClick={() => {this.delete(o)}}>
-                <i className="times icon"></i>
-              </span>
-            </li>
-            )}
-            })
-              :
-            list.map((o, i) => (
-            <li key={i} className="field hover-show">
-              <span className="ui checked checkbox">
-                <input type="checkbox" checked={o.status === 'COMPLATE'} onChange={() =>this.checkboxChange(o)} />
-                <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
-                  {o.tag ? <span className="highlight-tag">{'#' + o.tag + ' '}</span> : null}
-                  {o.title}
-                </label>
-              </span>
-              {
-                new Date(o.joinDateTime).getFullYear() === moment().year() ?
-                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("M月D日")}</span>
-                :
-                <span className="datetime">{moment.unix(o.joinDateTime/1000).format("YYYY年M月D日")}</span>
-              }
-              <span className="delete-btn" onClick={() => {this.delete(o)}}>
-                <i className="times icon"></i>
-              </span>
-            </li>
-            )))
-            }
+            {this.fliterTODO(list, currentTag, currentSelectDate)}
           </div>
         </section>
         <section className="right-part">
         </section>
       </div>
     );
+  }
+
+  fliterTODO(list, currentTag, currentSelectDate) {
+    const todayIsSelectDate = (o) => {
+      return this.unixToDate(o.joinDateTime, 'YYYYMD')
+        === this.unixToDate(currentSelectDate, 'YYYYMD')
+    };
+    //if 的形式不好，之后重构一下
+    if (currentTag) {
+      return list.map((o, i) => {
+        if(o.tag === currentTag) {
+          return this.renderTODOItem(o, i);
+        }
+      });
+    }
+
+    if(currentSelectDate) {
+      return list.map((o, i) => {
+        if (todayIsSelectDate(o)) {
+          return this.renderTODOItem(o, i);
+        }
+      });
+    }
+
+    return list.map((o, i) => {
+      return this.renderTODOItem(o, i);
+    });
+  }
+
+  renderTODOItem(o, i) {
+    const dateFormat = new Date(o.joinDateTime).getFullYear() === moment().year() ?
+      'M月D日' : 'YYYY年M月D日';
+    const date = this.unixToDate(o.joinDateTime, dateFormat);
+    return(
+      <li key={i} className="field hover-show">
+        <span className="ui checked checkbox">
+          <input type="checkbox" checked={o.status === 'COMPLATE'}
+            onChange={() =>this.checkboxChange(o)}
+          />
+          <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
+            <span className="highlight-tag">{'#' + o.tag + ' '}</span>
+            {o.title}
+          </label>
+        </span>
+        <span className="datetime">{date}</span>
+        <span className="delete-btn" onClick={() => {this.delete(o)}}>
+          <i className="times icon"></i>
+        </span>
+      </li>
+    );
+  }
+
+  unixToDate(unix, format) {
+    return moment.unix(unix / 1000).format(format);
   }
 
   inputChange(e) {
@@ -199,7 +182,7 @@ class App extends Component {
     this.setState({
       currentSelectDate: dateTime,
       currentTag: null
-});
+    });
   }
 
   changeTag(o) {
