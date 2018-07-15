@@ -28,7 +28,15 @@ class db {
       this.db.error = e2 => callback(e2.target.error);
       this.stores.forEach((o) => {
         if (!this.db.objectStoreNames.contains(o.name)) {
-          this.db.createObjectStore(o.name, o.option);
+          const store = this.db.createObjectStore(o.name, o.option);
+          if(o.index && o.index.length > 0) {
+            o.index.map((option) => {
+              const Obj = {};
+              const item = option.item;
+              Obj[item] = option.value;
+              store.createIndex(option.name, option.name, Obj);
+            });
+          }
         }
       });
     };
