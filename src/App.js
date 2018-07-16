@@ -62,7 +62,7 @@ class App extends Component {
   }
 
   render() {
-    const { list, tags, currentTag, currentSelectDate } = this.state;
+    const { list, tags, currentTag, currentSelectDate, currentTODO } = this.state;
     if(!list) return null;
     return (
       <div className="App">
@@ -116,6 +116,10 @@ class App extends Component {
           </div>
         </section>
         <section className="right-part">
+          <div className="right-content">
+            <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
+            <textarea className="article-textarea"></textarea>
+          </div>
         </section>
       </div>
     );
@@ -203,6 +207,7 @@ class App extends Component {
   editable(o) {
     this.setState({
       needEditItem: o,
+      currentTODO: o,
       editingTODO: o.title
     });
   }
