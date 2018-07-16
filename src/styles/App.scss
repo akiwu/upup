@@ -215,6 +215,9 @@ input.ui.small.edit-todo-input {
   padding: 2px 2px;
   width: auto;
   vertical-align: baseline;
+  &:focus {
+    border-radius: 0;
+  }
 }
 
 

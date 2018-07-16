@@ -183,6 +183,8 @@ input.ui.small.edit-todo-input {
   padding: 2px 2px;
   width: auto;
   vertical-align: baseline; }
+  input.ui.small.edit-todo-input:focus {
+    border-radius: 0; }
 
 @keyframes App-logo-spin {
   from {

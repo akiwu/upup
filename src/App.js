@@ -15,7 +15,7 @@ const stores = [
   {name:'tags', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'title', item: 'unique', value: true}]}
 ];
 
-const MyDB = new db('upup', 2, stores);
+const MyDB = new db('upup', 4, stores);
 
 MyDB.open((e) => {
   window.console.log(e);
@@ -45,7 +45,7 @@ class App extends Component {
       () => {
         this.fetchTodos()
         this.fetchTags()
-      }, 800
+      }, 500
     );
   }
 
