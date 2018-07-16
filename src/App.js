@@ -205,9 +205,19 @@ class App extends Component {
 
   saveSubArticle(e) {
     const subArticle = e.target.value;
-    const { currentTODOSubArticle } = this.state;
-    const article = currentTODOSubArticle;
-    article.value = subArticle;
+    const { currentTODOSubArticle, currentTODO } = this.state;
+    let article;
+    if (currentTODOSubArticle) {
+      //edit mode
+      article = currentTODOSubArticle;
+      article.value = subArticle;
+    } else {
+      //add mode
+      article = {
+        value: subArticle,
+        parentId: currentTODO.id
+      };
+    }
     MyDB.add('articles', article, (e) => {
       window.console.log(e);
     });
