@@ -174,7 +174,7 @@ class App extends Component {
             onChange={() =>this.checkboxChange(o)}
           />
           <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
-            <span className="highlight-tag">{'#' + o.tag + ' '}</span>
+            {o.tag ? <span className="highlight-tag">{'#' + o.tag + ' '}</span> : null}
             { needEditItem && needEditItem.title === o.title ?
             <input
               className="ui small edit-todo-input"
