@@ -2,13 +2,38 @@ import React, { Component } from 'react';
 import db                   from './db';
 import cn                   from 'classnames';
 import Calendar             from 'rc-calendar';
+import ReactCodeMirror      from 'react-codemirror';
 import zhCN                 from 'rc-calendar/lib/locale/zh_CN';
 import moment               from 'moment';
 import 'moment/locale/zh-cn';
 import 'rc-calendar/assets/index.css';
 import './styles/App.css';
 
-const HyperMD = require('hypermd');
+
+import 'codemirror/lib/codemirror.css';
+import 'hypermd/mode/hypermd.css';
+import 'hypermd/theme/hypermd-light.css';
+
+import 'codemirror/lib/codemirror';
+
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/gfm/gfm';
+
+import 'hypermd/core';
+import 'hypermd/mode/hypermd';
+
+import 'hypermd/addon/hide-token';
+import 'hypermd/addon/cursor-debounce';
+import 'hypermd/addon/fold';
+import 'hypermd/addon/read-link';
+import 'hypermd/addon/click';
+import 'hypermd/addon/hover';
+import 'hypermd/addon/paste';
+import 'hypermd/addon/insert-file';
+import 'hypermd/addon/mode-loader';
+import 'hypermd/addon/table-align';
 
 const now = moment().locale('zh-cn').utcOffset(8);
 
@@ -32,6 +57,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
+    this.codeMirrorRef = React.createRef();
 
     this.state = {
       content: '',
@@ -67,6 +93,23 @@ class App extends Component {
   }
 
   render() {
+    const options = {
+      mode: 'hypermd',
+      // mode: 'gfm',
+      theme: 'hypermd-light',
+
+      hmdFold: {
+        image: true,
+        link: true,
+        math: true,
+      },
+      hmdHideToken: true,
+      hmdCursorDebounce: true,
+      hmdPaste: true,
+      hmdClick: true,
+      hmdHover: true,
+      hmdTableAlign: true,
+    };
     const { list, tags, currentTag, currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
     if(!list) return null;
     return (
@@ -123,13 +166,14 @@ class App extends Component {
         <section className="right-part">
           <div className="right-content">
             <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
-            <textarea
-              className="article-textarea"
-              id="article-textarea"
+            <ReactCodeMirror
               value={currentTODOSubArticleValue}
-              onChange={(e) => this.setState({currentTODOSubArticleValue: e.target.value})}
-              onBlur={this.saveSubArticle.bind(this)}
-            ></textarea>
+              ref={this.codeMirrorRef}
+              className="article-textarea"
+              options={options}
+              onChange={(e) => this.setState({currentTODOSubArticleValue: e})}
+              onFocusChange={() => this.saveSubArticle}
+            />
           </div>
         </section>
       </div>
@@ -248,10 +292,6 @@ class App extends Component {
       this.setState({
         currentTODOSubArticle: result,
         currentTODOSubArticleValue: (result && result.value) || '',
-      });
-      const myTextarea = document.getElementById('article-textarea')
-      HyperMD.fromTextArea(myTextarea, {
-        lineNumbers: false
       });
     });
   }
