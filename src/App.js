@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import db                   from './db';
 import cn                   from 'classnames';
 import Calendar             from 'rc-calendar';
-import ReactCodeMirror      from 'react-codemirror';
 import zhCN                 from 'rc-calendar/lib/locale/zh_CN';
 import moment               from 'moment';
 import 'moment/locale/zh-cn';
@@ -10,20 +9,15 @@ import 'rc-calendar/assets/index.css';
 import './styles/App.css';
 
 
+import { Controlled as CodeMirror }   from 'react-codemirror2';
+
 import 'codemirror/lib/codemirror.css';
 import 'hypermd/mode/hypermd.css';
 import 'hypermd/theme/hypermd-light.css';
-
 import 'codemirror/lib/codemirror';
-
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/markdown/markdown';
-import 'codemirror/mode/gfm/gfm';
-
 import 'hypermd/core';
 import 'hypermd/mode/hypermd';
-
 import 'hypermd/addon/hide-token';
 import 'hypermd/addon/cursor-debounce';
 import 'hypermd/addon/fold';
@@ -57,7 +51,6 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.codeMirrorRef = React.createRef();
 
     this.state = {
       content: '',
@@ -95,8 +88,8 @@ class App extends Component {
   render() {
     const options = {
       mode: 'hypermd',
-      // mode: 'gfm',
       theme: 'hypermd-light',
+      lineNumbers: false,
 
       hmdFold: {
         image: true,
@@ -166,13 +159,12 @@ class App extends Component {
         <section className="right-part">
           <div className="right-content">
             <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
-            <ReactCodeMirror
+            <CodeMirror
               value={currentTODOSubArticleValue}
-              ref={this.codeMirrorRef}
               className="article-textarea"
               options={options}
-              onChange={(e) => this.setState({currentTODOSubArticleValue: e})}
-              onFocusChange={() => this.saveSubArticle}
+              onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
+              onBlur={this.saveSubArticle.bind(this)}
             />
           </div>
         </section>
@@ -250,18 +242,17 @@ class App extends Component {
     this.setState({content: e.target.value});
   }
 
-  saveSubArticle(e) {
-    const subArticle = e.target.value;
-    const { currentTODOSubArticle, currentTODO } = this.state;
+  saveSubArticle() {
+    const { currentTODOSubArticle, currentTODO, currentTODOSubArticleValue } = this.state;
     let article;
     if (currentTODOSubArticle) {
       //edit mode
       article = currentTODOSubArticle;
-      article.value = subArticle;
+      article.value = currentTODOSubArticleValue;
     } else {
       //add mode
       article = {
-        value: subArticle,
+        value: currentTODOSubArticleValue,
         parentId: currentTODO.id
       };
     }
