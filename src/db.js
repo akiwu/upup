@@ -26,17 +26,24 @@ class db {
       this.db = e.target.result;
       this.db.onabor = e2 => callback(e2.target.error);
       this.db.error = e2 => callback(e2.target.error);
+      const upgradeTransaction = e.target.transaction;
+      let objectStore;
       this.stores.forEach((o) => {
         if (!this.db.objectStoreNames.contains(o.name)) {
-          const store = this.db.createObjectStore(o.name, o.option);
-          if(o.index && o.index.length > 0) {
-            o.index.map((option) => {
-              const Obj = {};
-              const item = option.item;
-              Obj[item] = option.value;
-              store.createIndex(option.name, option.name, Obj);
-            });
-          }
+          objectStore = this.db.createObjectStore(o.name, o.option);
+        } else {
+          objectStore = upgradeTransaction.objectStore(o.name, o.option);
+        }
+        if(o.index && o.index.length > 0) {
+          o.index.map(option => {
+            const Obj = {};
+            const item = option.item;
+            Obj[item] = option.value;
+            if (!objectStore.indexNames.contains(option.name)) {
+              objectStore.createIndex(option.name, option.name, Obj);
+            }
+            return window.console.log('索引创建成功');
+          });
         }
       });
     };
@@ -57,6 +64,16 @@ class db {
   get(storeName, key, callback=(()=>{})) {
     if (this.db && key) {
       let request = this.db.transaction([storeName]).objectStore().get(key)
+      request.onerror = e => callback(e.target.error);
+      request.onsuccess = e => callback(e.target.result);
+    }
+  }
+
+  indexBy(storeName, indexName, key, callback=(()=>{})) {
+    if (this.db && key && indexName) {
+      let store = this.db.transaction([storeName], 'readonly').objectStore(storeName);
+      const search = store.index(indexName);
+      const request = search.get(key);
       request.onerror = e => callback(e.target.error);
       request.onsuccess = e => callback(e.target.result);
     }

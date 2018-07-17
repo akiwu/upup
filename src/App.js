@@ -12,10 +12,11 @@ const now = moment().locale('zh-cn').utcOffset(8);
 
 const stores = [
   {name:'todos', option: {autoIncrement: true, keyPath: 'id'}},
-  {name:'tags', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'title', item: 'unique', value: true}]}
+  {name:'tags', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'title', item: 'unique', value: true}]},
+  {name:'articles', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'parentId', item: 'unique', value: true}]}
 ];
 
-const MyDB = new db('upup', 2, stores);
+const MyDB = new db('upup', 9, stores);
 
 MyDB.open((e) => {
   window.console.log(e);
@@ -35,6 +36,8 @@ class App extends Component {
       currentTag: null,
       currentSelectDate: null,
       needEditItem: null,
+      currentTODOSubArticle: null,
+      currentTODOSubArticleValue: '',
       list: [],
       tags: []
     }
@@ -45,7 +48,7 @@ class App extends Component {
       () => {
         this.fetchTodos()
         this.fetchTags()
-      }, 800
+      }, 500
     );
   }
 
@@ -62,7 +65,7 @@ class App extends Component {
   }
 
   render() {
-    const { list, tags, currentTag, currentSelectDate } = this.state;
+    const { list, tags, currentTag, currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
     if(!list) return null;
     return (
       <div className="App">
@@ -116,6 +119,15 @@ class App extends Component {
           </div>
         </section>
         <section className="right-part">
+          <div className="right-content">
+            <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
+            <textarea
+              className="article-textarea"
+              value={currentTODOSubArticleValue}
+              onChange={(e) => this.setState({currentTODOSubArticleValue: e.target.value})}
+              onBlur={this.saveSubArticle.bind(this)}
+            ></textarea>
+          </div>
         </section>
       </div>
     );
@@ -132,6 +144,7 @@ class App extends Component {
         if(o.tag === currentTag) {
           return this.renderTODOItem(o, i);
         }
+        return null;
       });
     }
 
@@ -140,6 +153,7 @@ class App extends Component {
         if (todayIsSelectDate(o)) {
           return this.renderTODOItem(o, i);
         }
+        return null;
       });
     }
 
@@ -160,7 +174,7 @@ class App extends Component {
             onChange={() =>this.checkboxChange(o)}
           />
           <label className={cn({'first-three': i < 3, 'complate-status': o.status === 'COMPLATE'})}>
-            <span className="highlight-tag">{'#' + o.tag + ' '}</span>
+            {o.tag ? <span className="highlight-tag">{'#' + o.tag + ' '}</span> : null}
             { needEditItem && needEditItem.title === o.title ?
             <input
               className="ui small edit-todo-input"
@@ -189,6 +203,26 @@ class App extends Component {
     this.setState({content: e.target.value});
   }
 
+  saveSubArticle(e) {
+    const subArticle = e.target.value;
+    const { currentTODOSubArticle, currentTODO } = this.state;
+    let article;
+    if (currentTODOSubArticle) {
+      //edit mode
+      article = currentTODOSubArticle;
+      article.value = subArticle;
+    } else {
+      //add mode
+      article = {
+        value: subArticle,
+        parentId: currentTODO.id
+      };
+    }
+    MyDB.add('articles', article, (e) => {
+      window.console.log(e);
+    });
+  }
+
   saveEdit(e) {
     const { needEditItem } = this.state;
     const title = e.target.value;
@@ -203,7 +237,15 @@ class App extends Component {
   editable(o) {
     this.setState({
       needEditItem: o,
+      currentTODO: o,
       editingTODO: o.title
+    });
+
+    MyDB.indexBy('articles', 'parentId', o.id, (result) => {
+      this.setState({
+        currentTODOSubArticle: result,
+        currentTODOSubArticleValue: (result && result.value) || '',
+      });
     });
   }
 
