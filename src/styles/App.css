@@ -191,6 +191,14 @@ li {
   background: cornflowerblue;
   color: #e2b73b; }
 
+.CodeMirror {
+  height: 100% !important;
+  background: #fafafa !important; }
+
+.CodeMirror-gutters {
+  border: 0 !important;
+  background: #fafafa !important; }
+
 input.ui.small.edit-todo-input {
   border-top: none;
   border-left: none;
