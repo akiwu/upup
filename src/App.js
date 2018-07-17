@@ -8,6 +8,8 @@ import 'moment/locale/zh-cn';
 import 'rc-calendar/assets/index.css';
 import './styles/App.css';
 
+const HyperMD = require('hypermd');
+
 const now = moment().locale('zh-cn').utcOffset(8);
 
 const stores = [
@@ -123,6 +125,7 @@ class App extends Component {
             <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
             <textarea
               className="article-textarea"
+              id="article-textarea"
               value={currentTODOSubArticleValue}
               onChange={(e) => this.setState({currentTODOSubArticleValue: e.target.value})}
               onBlur={this.saveSubArticle.bind(this)}
@@ -245,6 +248,10 @@ class App extends Component {
       this.setState({
         currentTODOSubArticle: result,
         currentTODOSubArticleValue: (result && result.value) || '',
+      });
+      const myTextarea = document.getElementById('article-textarea')
+      HyperMD.fromTextArea(myTextarea, {
+        lineNumbers: false
       });
     });
   }

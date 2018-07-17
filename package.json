@@ -4,6 +4,10 @@
   "private": true,
   "dependencies": {
     "classnames": "^2.2.6",
+    "codemirror": "^5.39.0",
+    "hypermd": "^0.3.9",
+    "katex": "^0.10.0-beta",
+    "marked": "^0.4.0",
     "moment": "^2.22.2",
     "rc-calendar": "^9.6.2",
     "react": "^16.4.1",
