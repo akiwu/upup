@@ -15,7 +15,6 @@ import 'codemirror/lib/codemirror.css';
 import 'hypermd/mode/hypermd.css';
 import 'hypermd/theme/hypermd-light.css';
 import 'codemirror/lib/codemirror';
-import 'codemirror/mode/markdown/markdown';
 import 'hypermd/core';
 import 'hypermd/mode/hypermd';
 import 'hypermd/addon/hide-token';
@@ -24,8 +23,6 @@ import 'hypermd/addon/fold';
 import 'hypermd/addon/read-link';
 import 'hypermd/addon/click';
 import 'hypermd/addon/hover';
-import 'hypermd/addon/paste';
-import 'hypermd/addon/insert-file';
 import 'hypermd/addon/mode-loader';
 import 'hypermd/addon/table-align';
 
@@ -101,7 +98,7 @@ class App extends Component {
       hmdPaste: true,
       hmdClick: true,
       hmdHover: true,
-      hmdTableAlign: true,
+      hmdTableAlign: true
     };
     const { list, tags, currentTag, currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
     if(!list) return null;

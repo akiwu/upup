@@ -4650,7 +4650,7 @@ jsx-ast-utils@^2.0.0:
   dependencies:
     array-includes "^3.0.3"
 
-katex@^0.10.0-alpha, katex@^0.10.0-beta:
+katex@^0.10.0-alpha:
   version "0.10.0-beta"
   resolved "http://r.cnpmjs.org/katex/download/katex-0.10.0-beta.tgz#82c9ccb21fbc92c5dbed67db3240e299969efffb"
   dependencies:
