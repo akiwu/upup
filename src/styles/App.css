@@ -193,7 +193,8 @@ li {
 
 .CodeMirror {
   height: 100% !important;
-  background: #fafafa !important; }
+  background: #fafafa !important;
+  font-size: 14px !important; }
 
 .CodeMirror-gutters {
   border: 0 !important;
