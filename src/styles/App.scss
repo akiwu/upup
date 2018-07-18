@@ -226,6 +226,17 @@ li{
   color: rgb(226,183,59);
 }
 
+//reset Hypermd styles
+.CodeMirror {
+  height: 100%!important;
+  background: #fafafa!important;
+}
+
+.CodeMirror-gutters {
+  border: 0!important;
+  background: #fafafa!important;
+}
+
 input.ui.small.edit-todo-input {
   border-top: none;
   border-left: none;
