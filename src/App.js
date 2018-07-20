@@ -216,6 +216,7 @@ class App extends Component {
               className="ui small edit-todo-input"
               value={editingTODO}
               onChange={(e) => {this.setState({editingTODO: e.target.value})}}
+              onKeyPress={this.saveEdit.bind(this)}
               onBlur={this.saveEdit.bind(this)}
             />
             :
@@ -259,14 +260,16 @@ class App extends Component {
   }
 
   saveEdit(e) {
-    const { needEditItem } = this.state;
-    const title = e.target.value;
-    const todo = needEditItem;
-    todo.title = title;
-    MyDB.add('todos', todo, (e) => {
-      window.console.log(e);
-    });
-    this.setState({needEditItem: null});
+    if (e.key === 'Enter' || e.key === undefined) {
+      const { needEditItem } = this.state;
+      const title = e.target.value;
+      const todo = needEditItem;
+      todo.title = title;
+      MyDB.add('todos', todo, (e) => {
+        window.console.log(e);
+      });
+      this.setState({needEditItem: null});
+    }
   }
 
   editable(o) {
