@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import db                   from './db';
+import { isToday }          from './helpers';
 import cn                   from 'classnames';
 import Calendar             from 'rc-calendar';
 import zhCN                 from 'rc-calendar/lib/locale/zh_CN';
@@ -109,6 +110,9 @@ class App extends Component {
             <div className="header" onClick={() => this.changeTag()}>所有</div>
           </div>
           <div className="item">
+            <div className="header" onClick={() => this.calendarSelect(moment())}>今日</div>
+          </div>
+          <div className="item">
             <div className="header">标签</div>
             <div className="menu">
               {tags.map((o, i) => (
@@ -136,7 +140,13 @@ class App extends Component {
         <section className="main-page ui form">
           <header>
             <h1 className="ui header">
-              {currentTag ? currentTag : (currentSelectDate ? this.unixToDate(currentSelectDate, 'YYYY年M月D日') : '所有')}
+              {currentTag ?
+                currentTag : (currentSelectDate ?
+                (isToday(currentSelectDate) ?
+                '今日' :
+                this.unixToDate(currentSelectDate, 'YYYY年M月D日')) :
+                '所有')
+              }
             </h1>
             <form onSubmit={this.submit.bind(this)}>
               <div className="ui left icon input">
