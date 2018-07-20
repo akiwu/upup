@@ -210,9 +210,14 @@ class App extends Component {
 
   renderTODOItem(o, i) {
     const { needEditItem, editingTODO } = this.state;
-    const dateFormat = new Date(o.joinDateTime).getFullYear() === moment().year() ?
-      'M月D日' : 'YYYY年M月D日';
-    const date = this.unixToDate(o.joinDateTime, dateFormat);
+    let date;
+    if (o.joinDateTime) {
+      const dateFormat = new Date(o.joinDateTime).getFullYear() === moment().year() ?
+        'M月D日' : 'YYYY年M月D日';
+      date = this.unixToDate(o.joinDateTime, dateFormat);
+    } else {
+      date = '未设置';
+    }
     return(
       <li key={i} className="field hover-show">
         <span className="ui checked checkbox">
@@ -358,7 +363,7 @@ class App extends Component {
       if(this.state.currentSelectDate) {
         return moment(this.state.currentSelectDate).valueOf();
       }
-      return Date.parse(new Date());
+      return null;
     }
 
     const todo = {
