@@ -41,6 +41,23 @@ MyDB.open((e) => {
   window.console.log(e);
 });
 
+const options = {
+  mode: 'hypermd',
+  theme: 'hypermd-light',
+  lineNumbers: false,
+  hmdFold: {
+    image: true,
+    link: true,
+    math: true,
+  },
+  hmdHideToken: true,
+  hmdCursorDebounce: true,
+  hmdPaste: true,
+  hmdClick: true,
+  hmdHover: true,
+  hmdTableAlign: true
+};
+
 
 class App extends Component {
 
@@ -84,24 +101,7 @@ class App extends Component {
   }
 
   render() {
-    const options = {
-      mode: 'hypermd',
-      theme: 'hypermd-light',
-      lineNumbers: false,
-
-      hmdFold: {
-        image: true,
-        link: true,
-        math: true,
-      },
-      hmdHideToken: true,
-      hmdCursorDebounce: true,
-      hmdPaste: true,
-      hmdClick: true,
-      hmdHover: true,
-      hmdTableAlign: true
-    };
-    const { list, tags, currentTag, currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
+    const { list, tags, currentTag, currentSelectDate } = this.state;
     if(!list) return null;
     return (
       <div className="App">
@@ -110,7 +110,7 @@ class App extends Component {
             <div className="header" onClick={() => this.changeTag()}>所有</div>
           </div>
           <div className="item">
-            <div className="header" onClick={() => this.calendarSelect(moment())}>今日</div>
+            <div className="header" onClick={() => this.calendarSelect(moment())}>今天</div>
           </div>
           <div className="item">
             <div className="header">标签</div>
@@ -143,7 +143,7 @@ class App extends Component {
               {currentTag ?
                 currentTag : (currentSelectDate ?
                 (isToday(currentSelectDate) ?
-                '今日' :
+                '今天' :
                 this.unixToDate(currentSelectDate, 'YYYY年M月D日')) :
                 '所有')
               }
@@ -165,16 +165,35 @@ class App extends Component {
         </section>
         <section className="right-part">
           <div className="right-content">
-            <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
-            <CodeMirror
-              value={currentTODOSubArticleValue}
-              className="article-textarea"
-              options={options}
-              onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
-              onBlur={this.saveSubArticle.bind(this)}
-            />
+            {this.renderRightContnet()}
           </div>
         </section>
+      </div>
+    );
+  }
+
+  renderRightContnet() {
+    const { currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
+    if(currentSelectDate) {
+      const dateTitle = isToday(currentSelectDate) ? '今天' :
+        this.unixToDate(currentSelectDate, 'YYYY年M月D日');
+      return(
+        <div className="one-day">
+          <h1 className="day-title">我的{dateTitle}</h1>
+        </div>
+      );
+    }
+
+    return(
+      <div className="sub-article">
+        <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
+        <CodeMirror
+          value={currentTODOSubArticleValue}
+          className="article-textarea"
+          options={options}
+          onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
+          onBlur={this.saveSubArticle.bind(this)}
+        />
       </div>
     );
   }
