@@ -26,6 +26,7 @@ import 'hypermd/addon/click';
 import 'hypermd/addon/hover';
 import 'hypermd/addon/mode-loader';
 import 'hypermd/addon/table-align';
+import 'codemirror/addon/display/placeholder';
 
 const now = moment().locale('zh-cn').utcOffset(8);
 
@@ -180,6 +181,14 @@ class App extends Component {
       return(
         <div className="one-day">
           <h1 className="day-title">我的{dateTitle}</h1>
+          <h2>总结一下</h2>
+          <CodeMirror
+            value={currentTODOSubArticleValue}
+            className="day-textarea"
+            options={{...options, placeholder: '技术,工作,生活等方面简单的总结一下吧...'}}
+            onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
+            onBlur={this.saveSubArticle.bind(this)}
+          />
         </div>
       );
     }
