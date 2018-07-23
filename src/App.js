@@ -182,6 +182,16 @@ class App extends Component {
         <div className="one-day">
           <h1 className="day-title">我的{dateTitle}</h1>
           <h2>总结一下</h2>
+          <div class="ui mini form">
+            <div className="field">
+              <select className="ui dropdown">
+                <option value="">选择一个能表达今天状态的表情</option>
+                <option value="good">👑 </option>
+                <option value="medium">⭐</option>
+                <option value="bad">🐖</option>
+              </select>
+            </div>
+          </div>
           <CodeMirror
             value={currentTODOSubArticleValue}
             className="day-textarea"
