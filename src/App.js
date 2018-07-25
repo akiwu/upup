@@ -175,6 +175,20 @@ class App extends Component {
 
   renderRightContnet() {
     const { currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
+    if (currentTODO) {
+      return(
+        <div className="sub-article">
+          <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
+          <CodeMirror
+            value={currentTODOSubArticleValue}
+            className="article-textarea"
+            options={options}
+            onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
+            onBlur={this.saveSubArticle.bind(this)}
+          />
+        </div>
+      );
+    }
     if(currentSelectDate) {
       const dateTitle = isToday(currentSelectDate) ? '今天' :
         this.unixToDate(currentSelectDate, 'YYYY年M月D日');
@@ -195,26 +209,13 @@ class App extends Component {
           <CodeMirror
             value={currentTODOSubArticleValue}
             className="day-textarea"
-            options={{...options, placeholder: '技术,工作,生活等方面简单的总结一下吧...'}}
+            options={{...options, placeholder: '技术，工作，生活，自律等方面简单的总结一下吧...'}}
             onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
             onBlur={this.saveSubArticle.bind(this)}
           />
         </div>
       );
     }
-
-    return(
-      <div className="sub-article">
-        <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
-        <CodeMirror
-          value={currentTODOSubArticleValue}
-          className="article-textarea"
-          options={options}
-          onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
-          onBlur={this.saveSubArticle.bind(this)}
-        />
-      </div>
-    );
   }
 
   fliterTODO(list, currentTag, currentSelectDate) {
@@ -343,7 +344,8 @@ class App extends Component {
   calendarSelect = (dateTime) => {
     this.setState({
       currentSelectDate: dateTime,
-      currentTag: null
+      currentTag: null,
+      currentTODO: null
     });
   }
 
