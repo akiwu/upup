@@ -299,8 +299,8 @@ class App extends Component {
   }
 
   saveDaysArticle() {
-    const date = moment(currentSelectDate).valueOf();
     const { currentSelectDate, currentSelectDateArticleValue, day } = this.state;
+    const date = moment(currentSelectDate).valueOf();
     let article;
     if (day) {
       //edit mode
