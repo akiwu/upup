@@ -204,9 +204,9 @@ class App extends Component {
             <div className="field">
               <select className="ui dropdown">
                 <option value="">选择一个能表达今天状态的表情</option>
-                <option value="good">👑 </option>
-                <option value="medium">⭐</option>
-                <option value="bad">🐖</option>
+                <option value="good"><span role="img" aria-label="crown">👑 </span></option>
+                <option value="medium"><span role="img" aria-label="star">⭐</span></option>
+                <option value="bad"><span role="img" aria-label="pig">🐖</span></option>
               </select>
             </div>
           </div>
