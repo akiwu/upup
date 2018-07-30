@@ -52,7 +52,7 @@ li {
   .right-part .right-content {
     padding: 15px;
     height: 100%; }
-    .right-part .right-content .article-title, .right-part .right-content .day-title {
+    .right-part .right-content .article-title {
       font-size: 16px;
       font-weight: 700;
       line-height: 25px; }
