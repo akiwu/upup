@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import db                   from './db';
+import { isToday }          from './helpers';
 import cn                   from 'classnames';
 import Calendar             from 'rc-calendar';
 import zhCN                 from 'rc-calendar/lib/locale/zh_CN';
@@ -25,6 +26,7 @@ import 'hypermd/addon/click';
 import 'hypermd/addon/hover';
 import 'hypermd/addon/mode-loader';
 import 'hypermd/addon/table-align';
+import 'codemirror/addon/display/placeholder';
 
 const now = moment().locale('zh-cn').utcOffset(8);
 
@@ -39,6 +41,23 @@ const MyDB = new db('upup', 9, stores);
 MyDB.open((e) => {
   window.console.log(e);
 });
+
+const options = {
+  mode: 'hypermd',
+  theme: 'hypermd-light',
+  lineNumbers: false,
+  hmdFold: {
+    image: true,
+    link: true,
+    math: true,
+  },
+  hmdHideToken: true,
+  hmdCursorDebounce: true,
+  hmdPaste: true,
+  hmdClick: true,
+  hmdHover: true,
+  hmdTableAlign: true
+};
 
 
 class App extends Component {
@@ -83,30 +102,16 @@ class App extends Component {
   }
 
   render() {
-    const options = {
-      mode: 'hypermd',
-      theme: 'hypermd-light',
-      lineNumbers: false,
-
-      hmdFold: {
-        image: true,
-        link: true,
-        math: true,
-      },
-      hmdHideToken: true,
-      hmdCursorDebounce: true,
-      hmdPaste: true,
-      hmdClick: true,
-      hmdHover: true,
-      hmdTableAlign: true
-    };
-    const { list, tags, currentTag, currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
+    const { list, tags, currentTag, currentSelectDate } = this.state;
     if(!list) return null;
     return (
       <div className="App">
         <div className="ui visible vertical inverted menu sidebar">
           <div className="item">
             <div className="header" onClick={() => this.changeTag()}>所有</div>
+          </div>
+          <div className="item">
+            <div className="header" onClick={() => this.calendarSelect(moment())}>今天</div>
           </div>
           <div className="item">
             <div className="header">标签</div>
@@ -136,7 +141,13 @@ class App extends Component {
         <section className="main-page ui form">
           <header>
             <h1 className="ui header">
-              {currentTag ? currentTag : (currentSelectDate ? this.unixToDate(currentSelectDate, 'YYYY年M月D日') : '所有')}
+              {currentTag ?
+                currentTag : (currentSelectDate ?
+                (isToday(currentSelectDate) ?
+                '今天' :
+                this.unixToDate(currentSelectDate, 'YYYY年M月D日')) :
+                '所有')
+              }
             </h1>
             <form onSubmit={this.submit.bind(this)}>
               <div className="ui left icon input">
@@ -155,16 +166,53 @@ class App extends Component {
         </section>
         <section className="right-part">
           <div className="right-content">
-            <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
-            <CodeMirror
-              value={currentTODOSubArticleValue}
-              className="article-textarea"
-              options={options}
-              onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
-              onBlur={this.saveSubArticle.bind(this)}
-            />
+            {this.renderRightContnet()}
           </div>
         </section>
+      </div>
+    );
+  }
+
+  renderRightContnet() {
+    const { currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
+    if(currentSelectDate) {
+      const dateTitle = isToday(currentSelectDate) ? '今天' :
+        this.unixToDate(currentSelectDate, 'YYYY年M月D日');
+      return(
+        <div className="one-day">
+          <h1 className="day-title">我的{dateTitle}</h1>
+          <h2>总结一下</h2>
+          <div class="ui mini form">
+            <div className="field">
+              <select className="ui dropdown">
+                <option value="">选择一个能表达今天状态的表情</option>
+                <option value="good">👑 </option>
+                <option value="medium">⭐</option>
+                <option value="bad">🐖</option>
+              </select>
+            </div>
+          </div>
+          <CodeMirror
+            value={currentTODOSubArticleValue}
+            className="day-textarea"
+            options={{...options, placeholder: '技术,工作,生活等方面简单的总结一下吧...'}}
+            onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
+            onBlur={this.saveSubArticle.bind(this)}
+          />
+        </div>
+      );
+    }
+
+    return(
+      <div className="sub-article">
+        <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
+        <CodeMirror
+          value={currentTODOSubArticleValue}
+          className="article-textarea"
+          options={options}
+          onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
+          onBlur={this.saveSubArticle.bind(this)}
+        />
       </div>
     );
   }
@@ -200,9 +248,14 @@ class App extends Component {
 
   renderTODOItem(o, i) {
     const { needEditItem, editingTODO } = this.state;
-    const dateFormat = new Date(o.joinDateTime).getFullYear() === moment().year() ?
-      'M月D日' : 'YYYY年M月D日';
-    const date = this.unixToDate(o.joinDateTime, dateFormat);
+    let date;
+    if (o.joinDateTime) {
+      const dateFormat = new Date(o.joinDateTime).getFullYear() === moment().year() ?
+        'M月D日' : 'YYYY年M月D日';
+      date = this.unixToDate(o.joinDateTime, dateFormat);
+    } else {
+      date = '未设置';
+    }
     return(
       <li key={i} className="field hover-show">
         <span className="ui checked checkbox">
@@ -348,7 +401,7 @@ class App extends Component {
       if(this.state.currentSelectDate) {
         return moment(this.state.currentSelectDate).valueOf();
       }
-      return Date.parse(new Date());
+      return null;
     }
 
     const todo = {
