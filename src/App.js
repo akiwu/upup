@@ -73,6 +73,7 @@ class App extends Component {
       content: '',
       currentTag: null,
       currentSelectDate: null,
+      currentEmoji: null,
       needEditItem: null,
       currentTODOSubArticle: null,
       currentTODOSubArticleValue: '',
@@ -178,7 +179,7 @@ class App extends Component {
 
   renderRightContnet() {
     const { currentSelectDate, currentTODO, currentTODOSubArticleValue,
-      currentSelectDateArticleValue } = this.state;
+      currentSelectDateArticleValue, currentEmoji } = this.state;
     if (currentTODO) {
       return(
         <div className="sub-article">
@@ -202,7 +203,7 @@ class App extends Component {
           <h2>总结一下</h2>
           <div className="ui mini form">
             <div className="field">
-              <select className="ui dropdown">
+              <select className="ui dropdown" value={currentEmoji} onChange={this.selectDayEmoji.bind(this)}>
                 <option value="">选择一个能表达今天状态的表情</option>
                 <option value="good"><span role="img" aria-label="crown">👑 </span></option>
                 <option value="medium"><span role="img" aria-label="star">⭐</span></option>
@@ -220,6 +221,10 @@ class App extends Component {
         </div>
       );
     }
+  }
+
+  selectDayEmoji(o) {
+    this.setState({currentEmoji: o.target.value});
   }
 
   fliterTODO(list, currentTag, currentSelectDate) {
@@ -299,18 +304,21 @@ class App extends Component {
   }
 
   saveDaysArticle() {
-    const { currentSelectDate, currentSelectDateArticleValue, day } = this.state;
+    const { currentSelectDate, currentSelectDateArticleValue, day, currentEmoji } = this.state;
     const date = moment(currentSelectDate).valueOf();
+    console.log(currentEmoji);
     let article;
     if (day) {
       //edit mode
       article = day;
       article.content = currentSelectDateArticleValue;
+      article.mood = currentEmoji;
     } else {
       //add mode
       article = {
         content: currentSelectDateArticleValue,
-        date: date
+        date: date,
+        mood: currentEmoji
       };
     }
     MyDB.add('days', article, (e) => {
@@ -375,7 +383,8 @@ class App extends Component {
     MyDB.indexBy('days', 'date', date, (result) => {
       this.setState({
         day: result,
-        currentSelectDateArticleValue: (result && result.content) || ''
+        currentSelectDateArticleValue: (result && result.content) || '',
+        currentEmoji: (result && result.mood) || ''
       });
     });
   }
