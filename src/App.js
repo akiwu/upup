@@ -28,15 +28,16 @@ import 'hypermd/addon/mode-loader';
 import 'hypermd/addon/table-align';
 import 'codemirror/addon/display/placeholder';
 
-const now = moment().locale('zh-cn').utcOffset(8);
+const now = moment('00:00:00', 'HH:mm:ss').locale('zh-cn').utcOffset(8);
 
 const stores = [
   {name:'todos', option: {autoIncrement: true, keyPath: 'id'}},
   {name:'tags', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'title', item: 'unique', value: true}]},
-  {name:'articles', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'parentId', item: 'unique', value: true}]}
+  {name:'articles', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'parentId', item: 'unique', value: true}]},
+  {name:'days', option: {autoIncrement: true, keyPath: 'id'}, index: [{name: 'date', item: 'unique', value: true}]}
 ];
 
-const MyDB = new db('upup', 9, stores);
+const MyDB = new db('upup', 10, stores);
 
 MyDB.open((e) => {
   window.console.log(e);
@@ -72,9 +73,12 @@ class App extends Component {
       content: '',
       currentTag: null,
       currentSelectDate: null,
+      currentEmoji: null,
       needEditItem: null,
       currentTODOSubArticle: null,
       currentTODOSubArticleValue: '',
+      currentSelectDateArticleValue: '',
+      day: null,
       list: [],
       tags: []
     }
@@ -174,7 +178,22 @@ class App extends Component {
   }
 
   renderRightContnet() {
-    const { currentSelectDate, currentTODO, currentTODOSubArticleValue } = this.state;
+    const { currentSelectDate, currentTODO, currentTODOSubArticleValue,
+      currentSelectDateArticleValue, currentEmoji } = this.state;
+    if (currentTODO) {
+      return(
+        <div className="sub-article">
+          <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
+          <CodeMirror
+            value={currentTODOSubArticleValue}
+            className="article-textarea"
+            options={options}
+            onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
+            onBlur={this.saveSubArticle.bind(this)}
+          />
+        </div>
+      );
+    }
     if(currentSelectDate) {
       const dateTitle = isToday(currentSelectDate) ? '今天' :
         this.unixToDate(currentSelectDate, 'YYYY年M月D日');
@@ -182,39 +201,30 @@ class App extends Component {
         <div className="one-day">
           <h1 className="day-title">我的{dateTitle}</h1>
           <h2>总结一下</h2>
-          <div class="ui mini form">
+          <div className="ui mini form">
             <div className="field">
-              <select className="ui dropdown">
+              <select className="ui dropdown" value={currentEmoji} onChange={this.selectDayEmoji.bind(this)}>
                 <option value="">选择一个能表达今天状态的表情</option>
-                <option value="good">👑 </option>
-                <option value="medium">⭐</option>
-                <option value="bad">🐖</option>
+                <option value="good"><span role="img" aria-label="crown">👑 </span></option>
+                <option value="medium"><span role="img" aria-label="star">⭐</span></option>
+                <option value="bad"><span role="img" aria-label="pig">🐖</span></option>
               </select>
             </div>
           </div>
           <CodeMirror
-            value={currentTODOSubArticleValue}
+            value={currentSelectDateArticleValue}
             className="day-textarea"
-            options={{...options, placeholder: '技术,工作,生活等方面简单的总结一下吧...'}}
-            onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
-            onBlur={this.saveSubArticle.bind(this)}
+            options={{...options, placeholder: '技术，工作，生活，自律等方面简单的总结一下吧...'}}
+            onBeforeChange={(editor, data, value) => this.setState({currentSelectDateArticleValue: value})}
+            onBlur={this.saveDaysArticle.bind(this)}
           />
         </div>
       );
     }
+  }
 
-    return(
-      <div className="sub-article">
-        <h1 className="article-title">{currentTODO && currentTODO.title}</h1>
-        <CodeMirror
-          value={currentTODOSubArticleValue}
-          className="article-textarea"
-          options={options}
-          onBeforeChange={(editor, data, value) => this.setState({currentTODOSubArticleValue: value})}
-          onBlur={this.saveSubArticle.bind(this)}
-        />
-      </div>
-    );
+  selectDayEmoji(o) {
+    this.setState({currentEmoji: o.target.value});
   }
 
   fliterTODO(list, currentTag, currentSelectDate) {
@@ -293,6 +303,29 @@ class App extends Component {
     this.setState({content: e.target.value});
   }
 
+  saveDaysArticle() {
+    const { currentSelectDate, currentSelectDateArticleValue, day, currentEmoji } = this.state;
+    const date = moment(currentSelectDate).valueOf();
+    console.log(currentEmoji);
+    let article;
+    if (day) {
+      //edit mode
+      article = day;
+      article.content = currentSelectDateArticleValue;
+      article.mood = currentEmoji;
+    } else {
+      //add mode
+      article = {
+        content: currentSelectDateArticleValue,
+        date: date,
+        mood: currentEmoji
+      };
+    }
+    MyDB.add('days', article, (e) => {
+      window.console.log(e);
+    });
+  }
+
   saveSubArticle() {
     const { currentTODOSubArticle, currentTODO, currentTODOSubArticleValue } = this.state;
     let article;
@@ -343,7 +376,16 @@ class App extends Component {
   calendarSelect = (dateTime) => {
     this.setState({
       currentSelectDate: dateTime,
-      currentTag: null
+      currentTag: null,
+      currentTODO: null
+    });
+    const date = moment(dateTime).valueOf();
+    MyDB.indexBy('days', 'date', date, (result) => {
+      this.setState({
+        day: result,
+        currentSelectDateArticleValue: (result && result.content) || '',
+        currentEmoji: (result && result.mood) || ''
+      });
     });
   }
 
